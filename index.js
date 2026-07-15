@@ -5,7 +5,6 @@ const extensionName = "persistent-custom-css";
 const defaultSettings = { entries: [] };
 
 const STYLE_ID = "persistent-custom-css-style";
-const collapsedIds = new Set();
 
 function genId() {
     return (crypto.randomUUID ? crypto.randomUUID() : `pcc-${Date.now()}-${Math.random().toString(16).slice(2)}`);
@@ -36,7 +35,14 @@ function loadSettings() {
     }
 
     if (settings.entries.length === 0) {
-        settings.entries.push({ id: genId(), title: "CSS 1", enabled: true, css: "" });
+        settings.entries.push({ id: genId(), title: "CSS 1", enabled: true, collapsed: false, css: "" });
+    }
+
+    // 기존에 저장된 항목에 collapsed 필드가 없으면 채워줌
+    for (const entry of settings.entries) {
+        if (entry.collapsed === undefined) {
+            entry.collapsed = false;
+        }
     }
 
     return settings;
@@ -81,7 +87,7 @@ function renderEntries() {
     $list.empty();
 
     settings.entries.forEach((entry) => {
-        const isCollapsed = collapsedIds.has(entry.id);
+        const isCollapsed = !!entry.collapsed;
         const html = `
         <div class="pcc-entry${isCollapsed ? " pcc-collapsed" : ""}" data-id="${entry.id}">
             <div class="pcc-entry-header">
@@ -170,17 +176,17 @@ function addSettingsUI() {
 
     $list.on("click", ".pcc-entry-collapse", function () {
         const id = $(this).closest(".pcc-entry").data("id");
-        $(this).closest(".pcc-entry").toggleClass("pcc-collapsed");
-        if (collapsedIds.has(id)) {
-            collapsedIds.delete(id);
-        } else {
-            collapsedIds.add(id);
+        const settings = loadSettings();
+        const entry = settings.entries.find(e => e.id === id);
+        if (entry) {
+            entry.collapsed = !entry.collapsed;
+            $(this).closest(".pcc-entry").toggleClass("pcc-collapsed", entry.collapsed);
+            saveSettingsDebounced();
         }
     });
 
     $list.on("click", ".pcc-entry-delete", function () {
         const id = $(this).closest(".pcc-entry").data("id");
-        collapsedIds.delete(id);
         const settings = loadSettings();
         settings.entries = settings.entries.filter(e => e.id !== id);
         if (settings.entries.length === 0) {
@@ -198,6 +204,7 @@ function addSettingsUI() {
             id: genId(),
             title: `CSS ${settings.entries.length + 1}`,
             enabled: true,
+            collapsed: false,
             css: "",
         });
         saveSettingsDebounced();
