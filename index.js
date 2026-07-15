@@ -83,6 +83,11 @@ function renderEntries() {
         const html = `
         <div class="pcc-entry" data-id="${entry.id}">
             <div class="pcc-entry-header">
+                <button type="button" class="pcc-entry-collapse" title="접기/펼치기">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                        <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
                 <input type="text" class="pcc-entry-title" value="${escapeAttr(entry.title)}" placeholder="이름 없음">
                 <div class="pcc-entry-controls">
                     <label class="pcc-switch">
@@ -159,6 +164,10 @@ function addSettingsUI() {
             applyPersistentCSS();
             updateMasterToggle();
         }
+    });
+
+    $list.on("click", ".pcc-entry-collapse", function () {
+        $(this).closest(".pcc-entry").toggleClass("pcc-collapsed");
     });
 
     $list.on("click", ".pcc-entry-delete", function () {

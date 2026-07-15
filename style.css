@@ -66,6 +66,32 @@
     border-radius: 6px;
 }
 
+.pcc-entry-collapse {
+    background: transparent;
+    border: none;
+    color: var(--pcc-text);
+    opacity: 0.5;
+    cursor: pointer;
+    padding: 2px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+.pcc-entry-collapse:hover {
+    opacity: 0.9;
+}
+.pcc-entry-collapse svg {
+    width: 13px;
+    height: 13px;
+    transition: transform 0.2s ease;
+}
+.pcc-entry.pcc-collapsed .pcc-entry-collapse svg {
+    transform: rotate(-90deg);
+}
+.pcc-entry.pcc-collapsed textarea {
+    display: none;
+}
+
 .pcc-entry-header {
     display: flex;
     align-items: center;
