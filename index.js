@@ -5,6 +5,7 @@ const extensionName = "persistent-custom-css";
 const defaultSettings = { entries: [] };
 
 const STYLE_ID = "persistent-custom-css-style";
+const collapsedIds = new Set();
 
 function genId() {
     return (crypto.randomUUID ? crypto.randomUUID() : `pcc-${Date.now()}-${Math.random().toString(16).slice(2)}`);
@@ -80,8 +81,9 @@ function renderEntries() {
     $list.empty();
 
     settings.entries.forEach((entry) => {
+        const isCollapsed = collapsedIds.has(entry.id);
         const html = `
-        <div class="pcc-entry" data-id="${entry.id}">
+        <div class="pcc-entry${isCollapsed ? " pcc-collapsed" : ""}" data-id="${entry.id}">
             <div class="pcc-entry-header">
                 <button type="button" class="pcc-entry-collapse" title="접기/펼치기">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
@@ -167,11 +169,18 @@ function addSettingsUI() {
     });
 
     $list.on("click", ".pcc-entry-collapse", function () {
+        const id = $(this).closest(".pcc-entry").data("id");
         $(this).closest(".pcc-entry").toggleClass("pcc-collapsed");
+        if (collapsedIds.has(id)) {
+            collapsedIds.delete(id);
+        } else {
+            collapsedIds.add(id);
+        }
     });
 
     $list.on("click", ".pcc-entry-delete", function () {
         const id = $(this).closest(".pcc-entry").data("id");
+        collapsedIds.delete(id);
         const settings = loadSettings();
         settings.entries = settings.entries.filter(e => e.id !== id);
         if (settings.entries.length === 0) {
