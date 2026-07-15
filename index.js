@@ -43,18 +43,15 @@ function keepStyleOnTop() {
 
 function addSettingsUI() {
     const settings = loadSettings();
+    // ST 기본 inline-drawer 구조 사용 -> 다른 확장 항목들과 동일하게
+    // 이름 + 화살표로 접힌 채 리스트에 표시되고, 클릭하면 펼쳐짐
     const html = `
-    <div class="pcc-panel pcc-open" id="pcc-panel">
-        <div class="pcc-header" id="pcc-header">
-            <div class="pcc-title">
-                <span class="pcc-dot"></span>
-                Persistent Custom CSS
-            </div>
-            <svg class="pcc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
-                <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header">
+            <b>Persistent Custom CSS</b>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
         </div>
-        <div class="pcc-content">
+        <div class="inline-drawer-content">
             <div class="pcc-inner">
 
                 <div class="pcc-row-toggle">
@@ -88,10 +85,6 @@ function addSettingsUI() {
     </div>`;
 
     $("#extensions_settings2").append(html);
-
-    $("#pcc-header").on("click", function () {
-        $("#pcc-panel").toggleClass("pcc-open");
-    });
 
     $("#pcc-enabled").on("change", function () {
         settings.enabled = $(this).is(":checked");

@@ -1,79 +1,28 @@
 /* Persistent Custom CSS - settings panel style
-   승인된 라이트 목업 디자인 그대로 적용, 블러/글로우 없음, ST 테마와 무관하게 항상 라이트 톤 */
+   바깥 헤더(이름+화살표)는 ST 기본 inline-drawer를 그대로 써서
+   다른 확장 목록 항목들과 동일하게 보이게 함.
+   안쪽 내용 색상은 하드코딩하지 않고 현재 ST 테마 변수를 따라감. */
 
-.pcc-panel,
-.pcc-panel * {
+.pcc-inner,
+.pcc-inner * {
     box-sizing: border-box;
-    font-family: -apple-system, 'Segoe UI', 'Noto Sans KR', sans-serif;
-}
-
-.pcc-panel {
-    --pcc-border: #d4d4d8;
-    --pcc-border-strong: #a8a8b0;
-    --pcc-text: #18181b;
-    --pcc-text-sub: #45454d;
-    --pcc-accent: #2f5ad6;
-    --pcc-accent-bg: #e8edfb;
-    --pcc-panel-bg: #ffffff;
-    --pcc-field-bg: #f7f7f8;
-
-    background: var(--pcc-panel-bg) !important;
-    border: 1px solid var(--pcc-border-strong) !important;
-    border-radius: 10px !important;
-    overflow: hidden;
-    color: var(--pcc-text) !important;
-    margin-top: 8px;
-}
-
-.pcc-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 16px;
-    cursor: pointer;
-    user-select: none;
-    background: #fafafa !important;
-    border-bottom: 1px solid var(--pcc-border);
-}
-
-.pcc-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--pcc-text) !important;
-}
-
-.pcc-title .pcc-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--pcc-accent);
-}
-
-.pcc-chevron {
-    width: 18px;
-    height: 18px;
-    color: var(--pcc-text);
-    transition: transform 0.25s ease;
-}
-.pcc-panel.pcc-open .pcc-chevron { transform: rotate(180deg); }
-
-.pcc-content {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-}
-.pcc-panel.pcc-open .pcc-content {
-    max-height: 560px;
 }
 
 .pcc-inner {
-    padding: 16px;
+    --pcc-text: var(--SmartThemeBodyColor);
+    --pcc-bg: var(--SmartThemeBlurTintColor);
+    --pcc-border: var(--SmartThemeBorderColor, rgba(128, 128, 128, 0.35));
+    --pcc-accent: var(--SmartThemeQuoteColor, var(--SmartThemeEmColor, var(--pcc-text)));
+    /* 패널 배경보다 살짝 대비되는 필드 배경을 테마 색에서 자동으로 계산 */
+    --pcc-field-bg: color-mix(in srgb, var(--pcc-bg) 85%, var(--pcc-text) 15%);
+    --pcc-accent-bg: color-mix(in srgb, var(--pcc-accent) 12%, var(--pcc-bg) 88%);
+
     display: flex;
     flex-direction: column;
     gap: 14px;
+    padding: 12px 4px 4px;
+    color: var(--pcc-text);
+    font-family: inherit;
 }
 
 .pcc-row-toggle {
@@ -81,7 +30,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 10px 12px;
-    background: var(--pcc-field-bg) !important;
+    background: var(--pcc-field-bg);
     border: 1px solid var(--pcc-border);
     border-radius: 8px;
 }
@@ -89,11 +38,12 @@
 .pcc-row-toggle .pcc-label {
     font-size: 13px;
     font-weight: 700;
-    color: var(--pcc-text) !important;
+    color: var(--pcc-text);
 }
 .pcc-row-toggle .pcc-sub {
     font-size: 11.5px;
-    color: var(--pcc-text-sub) !important;
+    color: var(--pcc-text);
+    opacity: 0.75;
     margin-top: 2px;
 }
 
@@ -108,8 +58,8 @@
 .pcc-switch .pcc-track {
     position: absolute;
     inset: 0;
-    background: #c4c4cc;
-    border: 1px solid var(--pcc-border-strong);
+    background: var(--pcc-border);
+    border: 1px solid var(--pcc-border);
     border-radius: 999px;
     transition: background 0.2s ease;
 }
@@ -117,40 +67,46 @@
     position: absolute;
     top: 2px; left: 2px;
     width: 18px; height: 18px;
-    background: #ffffff;
-    border: 1px solid var(--pcc-border-strong);
+    background: var(--pcc-bg);
+    border: 1px solid var(--pcc-border);
     border-radius: 50%;
     transition: transform 0.2s ease;
 }
-.pcc-switch input:checked + .pcc-track { background: var(--pcc-accent); border-color: var(--pcc-accent); }
-.pcc-switch input:checked + .pcc-track .pcc-thumb { transform: translateX(16px); border-color: var(--pcc-accent); }
+.pcc-switch input:checked + .pcc-track {
+    background: var(--pcc-accent);
+    border-color: var(--pcc-accent);
+}
+.pcc-switch input:checked + .pcc-track .pcc-thumb {
+    transform: translateX(16px);
+    border-color: var(--pcc-accent);
+}
 
 .pcc-field-label {
     font-size: 12px;
     font-weight: 700;
-    color: var(--pcc-text) !important;
+    color: var(--pcc-text);
     letter-spacing: 0.03em;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.pcc-panel textarea {
+.pcc-inner textarea {
     width: 100%;
     min-height: 160px;
     resize: vertical;
-    background: var(--pcc-field-bg) !important;
-    border: 1px solid var(--pcc-border-strong) !important;
-    border-radius: 8px !important;
-    padding: 10px 12px !important;
-    color: var(--pcc-text) !important;
-    font-family: 'JetBrains Mono', 'Consolas', monospace !important;
-    font-size: 12.5px !important;
-    line-height: 1.6 !important;
+    background: var(--pcc-field-bg);
+    border: 1px solid var(--pcc-border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--pcc-text);
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 12.5px;
+    line-height: 1.6;
     outline: none;
 }
-.pcc-panel textarea:focus {
-    border-color: var(--pcc-accent) !important;
+.pcc-inner textarea:focus {
+    border-color: var(--pcc-accent);
 }
 
 .pcc-status {
@@ -159,21 +115,26 @@
     gap: 6px;
     font-size: 11.5px;
     font-weight: 700;
-    color: #1a7a34 !important;
+    color: var(--pcc-accent);
 }
 .pcc-status .pcc-dot2 {
     width: 7px; height: 7px;
     border-radius: 50%;
-    background: #1a7a34;
+    background: var(--pcc-accent);
 }
 
 .pcc-hint {
     font-size: 12px;
-    color: var(--pcc-text-sub) !important;
+    color: var(--pcc-text);
+    opacity: 0.85;
     line-height: 1.6;
-    background: var(--pcc-accent-bg) !important;
-    border: 1px solid #c7d3f5;
+    background: var(--pcc-accent-bg);
+    border: 1px solid var(--pcc-border);
     border-radius: 8px;
     padding: 10px 12px;
 }
-.pcc-hint b { color: var(--pcc-accent) !important; font-weight: 700; }
+.pcc-hint b {
+    color: var(--pcc-accent);
+    font-weight: 700;
+    opacity: 1;
+}
