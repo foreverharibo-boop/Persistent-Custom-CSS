@@ -11,14 +11,14 @@
 .pcc-inner {
     --pcc-text: var(--SmartThemeBodyColor);
     --pcc-bg: var(--SmartThemeBlurTintColor);
-    --pcc-border: var(--SmartThemeBorderColor, rgba(128, 128, 128, 0.35));
+    --pcc-border: var(--SmartThemeBorderColor, rgba(128, 128, 128, 0.25));
     --pcc-accent: var(--SmartThemeQuoteColor, var(--SmartThemeEmColor, var(--pcc-text)));
-    --pcc-field-bg: color-mix(in srgb, var(--pcc-bg) 85%, var(--pcc-text) 15%);
+    --pcc-field-bg: color-mix(in srgb, var(--pcc-bg) 92%, var(--pcc-text) 8%);
 
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 12px 4px 4px;
+    gap: 8px;
+    padding: 8px 2px 2px;
     color: var(--pcc-text);
     font-family: inherit;
 }
@@ -27,41 +27,49 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 6px 4px 2px;
+    padding: 2px 2px 6px;
+    border-bottom: 1px solid var(--pcc-border);
+    margin-bottom: 2px;
 }
 .pcc-master-label {
-    font-size: 10.5px;
+    font-size: 10px;
     font-weight: 600;
     color: var(--pcc-text);
-    opacity: 0.7;
+    opacity: 0.6;
     letter-spacing: 0.02em;
 }
 .pcc-switch-sm {
-    width: 32px;
-    height: 19px;
+    width: 30px;
+    height: 17px;
 }
 .pcc-switch-sm .pcc-thumb {
-    width: 14px;
-    height: 14px;
+    width: 13px;
+    height: 13px;
 }
 .pcc-switch-sm input:checked + .pcc-track .pcc-thumb {
     transform: translateX(13px);
 }
 
+#pcc-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 .pcc-entry {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding: 10px 12px;
-    background: var(--pcc-field-bg);
+    gap: 6px;
+    padding: 8px 8px;
+    background: transparent;
     border: 1px solid var(--pcc-border);
-    border-radius: 8px;
+    border-radius: 6px;
 }
 
 .pcc-entry-header {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .pcc-entry-title {
@@ -71,9 +79,9 @@
     border: none;
     border-bottom: 1px solid transparent;
     color: var(--pcc-text);
-    font-size: 13px;
-    font-weight: 700;
-    padding: 4px 2px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px;
     outline: none;
 }
 .pcc-entry-title:focus {
@@ -81,13 +89,13 @@
 }
 .pcc-entry-title::placeholder {
     color: var(--pcc-text);
-    opacity: 0.5;
+    opacity: 0.45;
 }
 
 .pcc-entry-controls {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 6px;
     flex-shrink: 0;
 }
 
@@ -95,20 +103,20 @@
     background: transparent;
     border: none;
     color: var(--pcc-text);
-    opacity: 0.55;
-    font-size: 14px;
+    opacity: 0.4;
+    font-size: 11px;
     line-height: 1;
     cursor: pointer;
-    padding: 2px 4px;
+    padding: 2px;
 }
 .pcc-entry-delete:hover {
-    opacity: 1;
+    opacity: 0.9;
 }
 
 .pcc-switch {
     position: relative;
-    width: 40px;
-    height: 24px;
+    width: 34px;
+    height: 20px;
     flex-shrink: 0;
     display: inline-block;
 }
@@ -123,8 +131,8 @@
 }
 .pcc-switch .pcc-thumb {
     position: absolute;
-    top: 2px; left: 2px;
-    width: 18px; height: 18px;
+    top: 1px; left: 1px;
+    width: 16px; height: 16px;
     background: var(--pcc-bg);
     border: 1px solid var(--pcc-border);
     border-radius: 50%;
@@ -135,22 +143,22 @@
     border-color: var(--pcc-accent);
 }
 .pcc-switch input:checked + .pcc-track .pcc-thumb {
-    transform: translateX(16px);
+    transform: translateX(14px);
     border-color: var(--pcc-accent);
 }
 
 .pcc-entry textarea {
     width: 100%;
-    min-height: 130px;
+    min-height: 100px;
     resize: vertical;
-    background: var(--pcc-bg);
+    background: var(--pcc-field-bg);
     border: 1px solid var(--pcc-border);
-    border-radius: 8px;
-    padding: 10px 12px;
+    border-radius: 6px;
+    padding: 8px 10px;
     color: var(--pcc-text);
     font-family: 'JetBrains Mono', 'Consolas', monospace;
-    font-size: 12.5px;
-    line-height: 1.6;
+    font-size: 12px;
+    line-height: 1.55;
     outline: none;
 }
 .pcc-entry textarea:focus {
@@ -159,16 +167,18 @@
 
 .pcc-add-btn {
     align-self: flex-start;
-    background: var(--pcc-field-bg);
-    border: 1px dashed var(--pcc-border);
+    background: transparent;
+    border: 1px solid var(--pcc-border);
     color: var(--pcc-text);
-    font-size: 12.5px;
-    font-weight: 700;
-    padding: 8px 14px;
-    border-radius: 8px;
+    opacity: 0.75;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
     cursor: pointer;
 }
 .pcc-add-btn:hover {
+    opacity: 1;
     border-color: var(--pcc-accent);
     color: var(--pcc-accent);
 }
