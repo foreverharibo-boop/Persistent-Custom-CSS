@@ -66,6 +66,132 @@
     border-radius: 6px;
 }
 
+.pcc-filter-bar {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 0 2px 2px;
+}
+.pcc-filter-pill {
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--pcc-border);
+    background: transparent;
+    color: var(--pcc-text);
+    opacity: 0.6;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.pcc-filter-pill:hover {
+    opacity: 0.9;
+}
+.pcc-filter-pill.active {
+    background: var(--pcc-accent);
+    border-color: var(--pcc-accent);
+    color: var(--pcc-bg);
+    opacity: 1;
+}
+
+.pcc-folder {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--pcc-border);
+    border-radius: 6px;
+    overflow: hidden;
+}
+.pcc-folder-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 8px;
+    background: color-mix(in srgb, var(--pcc-bg) 94%, var(--pcc-text) 6%);
+}
+.pcc-folder-icon {
+    font-size: 12px;
+    opacity: 0.8;
+    flex-shrink: 0;
+}
+.pcc-folder-title {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid transparent;
+    color: var(--pcc-text);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px;
+    outline: none;
+}
+.pcc-folder-title:focus {
+    border-bottom-color: var(--pcc-accent);
+}
+.pcc-folder-delete {
+    background: transparent;
+    border: none;
+    color: var(--pcc-text);
+    opacity: 0.4;
+    font-size: 11px;
+    cursor: pointer;
+    padding: 2px;
+    flex-shrink: 0;
+}
+.pcc-folder-delete:hover {
+    opacity: 0.9;
+}
+.pcc-folder-collapse {
+    background: transparent;
+    border: none;
+    color: var(--pcc-text);
+    opacity: 0.5;
+    cursor: pointer;
+    padding: 2px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+.pcc-folder-collapse svg {
+    width: 13px;
+    height: 13px;
+    transition: transform 0.2s ease;
+}
+.pcc-folder.pcc-collapsed .pcc-folder-collapse svg {
+    transform: rotate(-90deg);
+}
+.pcc-folder.pcc-collapsed .pcc-folder-body {
+    display: none;
+}
+.pcc-folder-body {
+    padding: 8px;
+}
+.pcc-folder-entries {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.pcc-folder-entries .pcc-entry {
+    border-style: dashed;
+}
+
+.pcc-entry-folder {
+    background: transparent;
+    border: 1px solid var(--pcc-border);
+    border-radius: 5px;
+    color: var(--pcc-text);
+    font-size: 10.5px;
+    padding: 2px 4px;
+    max-width: 74px;
+    outline: none;
+}
+
+.pcc-btn-row {
+    display: flex;
+    gap: 8px;
+}
+
 .pcc-entry-collapse {
     background: transparent;
     border: none;
