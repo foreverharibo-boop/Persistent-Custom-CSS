@@ -318,6 +318,7 @@ function addSettingsUI() {
         if (folder) {
             folder.title = $(this).val();
             saveSettingsDebounced();
+            renderFilterBar(settings);
         }
     });
 
