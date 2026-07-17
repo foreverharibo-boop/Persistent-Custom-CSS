@@ -119,12 +119,13 @@
     min-width: 0;
     background: transparent;
     border: none;
-    border-bottom: 1px solid transparent;
+    border-bottom: 1px dashed var(--pcc-border);
     color: var(--pcc-text);
     font-size: 12px;
     font-weight: 700;
     padding: 2px;
     outline: none;
+    cursor: text;
 }
 .pcc-folder-title:focus {
     border-bottom-color: var(--pcc-accent);
@@ -181,9 +182,9 @@
     border: 1px solid var(--pcc-border);
     border-radius: 5px;
     color: var(--pcc-text);
-    font-size: 10.5px;
-    padding: 2px 4px;
-    max-width: 74px;
+    font-size: 9.5px;
+    padding: 1px 2px;
+    max-width: 54px;
     outline: none;
 }
 
