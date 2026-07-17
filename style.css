@@ -119,7 +119,6 @@
     min-width: 0;
     background: transparent;
     border: none;
-    border-bottom: 1px dashed var(--pcc-border);
     color: var(--pcc-text);
     font-size: 12px;
     font-weight: 700;
