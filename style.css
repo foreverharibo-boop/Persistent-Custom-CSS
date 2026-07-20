@@ -192,6 +192,30 @@
     gap: 8px;
 }
 
+.pcc-move {
+    display: flex;
+    flex-direction: column;
+    line-height: 0;
+    flex-shrink: 0;
+    gap: 1px;
+}
+.pcc-move button {
+    background: transparent;
+    border: none;
+    color: var(--pcc-text);
+    opacity: 0.4;
+    font-size: 8px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 2px;
+}
+.pcc-move button:hover {
+    opacity: 0.9;
+}
+.pcc-folder-toggle-wrap {
+    flex-shrink: 0;
+}
+
 .pcc-entry-collapse {
     background: transparent;
     border: none;

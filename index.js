@@ -1,5 +1,6 @@
 import { extension_settings } from "../../../extensions.js";
 import { saveSettingsDebounced } from "../../../../script.js";
+import { callGenericPopup, POPUP_TYPE, POPUP_RESULT } from "../../../popup.js";
 
 const extensionName = "persistent-custom-css";
 const defaultSettings = { entries: [], folders: [] };
@@ -104,6 +105,10 @@ function buildEntryHtml(entry, folders) {
                     <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </button>
+            <span class="pcc-move">
+                <button type="button" class="pcc-move-up" title="위로">▲</button>
+                <button type="button" class="pcc-move-down" title="아래로">▼</button>
+            </span>
             <input type="text" class="pcc-entry-title" value="${escapeAttr(entry.title)}" placeholder="이름 없음">
             <div class="pcc-entry-controls">
                 ${folders.length > 0 ? `
@@ -184,8 +189,16 @@ function renderEntries() {
                         <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </button>
+                <span class="pcc-move">
+                    <button type="button" class="pcc-folder-move-up" title="위로">▲</button>
+                    <button type="button" class="pcc-folder-move-down" title="아래로">▼</button>
+                </span>
                 <span class="pcc-folder-icon">📁</span>
                 <input type="text" class="pcc-folder-title" value="${escapeAttr(folder.title)}" placeholder="폴더 이름">
+                <label class="pcc-switch pcc-switch-sm pcc-folder-toggle-wrap">
+                    <input type="checkbox" class="pcc-folder-toggle">
+                    <span class="pcc-track"><span class="pcc-thumb"></span></span>
+                </label>
                 <button type="button" class="pcc-folder-delete" title="폴더 삭제 (안의 항목은 유지됨)">✕</button>
             </div>
             <div class="pcc-folder-body">
@@ -193,9 +206,10 @@ function renderEntries() {
             </div>
         </div>`);
         const $entriesBox = $folder.find(".pcc-folder-entries");
-        settings.entries
-            .filter(e => e.folderId === folder.id)
-            .forEach(entry => $entriesBox.append(buildEntryHtml(entry, settings.folders)));
+        const folderEntries = settings.entries.filter(e => e.folderId === folder.id);
+        folderEntries.forEach(entry => $entriesBox.append(buildEntryHtml(entry, settings.folders)));
+        const allOn = folderEntries.length > 0 && folderEntries.every(e => e.enabled);
+        $folder.find(".pcc-folder-toggle").prop("checked", allOn);
         $list.append($folder);
     });
 
@@ -227,6 +241,11 @@ function addSettingsUI() {
                 <div class="pcc-btn-row">
                     <button type="button" id="pcc-add" class="pcc-add-btn">+ CSS 항목 추가</button>
                     <button type="button" id="pcc-add-folder" class="pcc-add-btn">+ 폴더 추가</button>
+                </div>
+                <div class="pcc-btn-row">
+                    <button type="button" id="pcc-export" class="pcc-add-btn">내보내기</button>
+                    <button type="button" id="pcc-import" class="pcc-add-btn">가져오기</button>
+                    <input type="file" id="pcc-import-file" accept="application/json,.json" style="display:none">
                 </div>
             </div>
         </div>
@@ -274,6 +293,50 @@ function addSettingsUI() {
             applyPersistentCSS();
             updateMasterToggle();
         }
+    });
+
+    // 같은 그룹(같은 folderId, 또는 폴더 미지정끼리) 안에서 항목 순서를 위/아래로 이동
+    function moveEntry(id, dir) {
+        const settings = loadSettings();
+        const entry = settings.entries.find(e => e.id === id);
+        if (!entry) return;
+        // 같은 folderId를 가진 형제들의 전체 배열 내 인덱스 목록
+        const siblingIdx = settings.entries
+            .map((e, i) => ({ e, i }))
+            .filter(x => x.e.folderId === entry.folderId)
+            .map(x => x.i);
+        const pos = siblingIdx.indexOf(settings.entries.indexOf(entry));
+        const target = pos + dir;
+        if (target < 0 || target >= siblingIdx.length) return;
+        const a = siblingIdx[pos];
+        const b = siblingIdx[target];
+        [settings.entries[a], settings.entries[b]] = [settings.entries[b], settings.entries[a]];
+        saveSettingsDebounced();
+        applyPersistentCSS();
+        renderEntries();
+    }
+
+    function moveFolder(id, dir) {
+        const settings = loadSettings();
+        const idx = settings.folders.findIndex(f => f.id === id);
+        const target = idx + dir;
+        if (idx < 0 || target < 0 || target >= settings.folders.length) return;
+        [settings.folders[idx], settings.folders[target]] = [settings.folders[target], settings.folders[idx]];
+        saveSettingsDebounced();
+        renderEntries();
+    }
+
+    $list.on("click", ".pcc-move-up", function () {
+        moveEntry($(this).closest(".pcc-entry").data("id"), -1);
+    });
+    $list.on("click", ".pcc-move-down", function () {
+        moveEntry($(this).closest(".pcc-entry").data("id"), 1);
+    });
+    $list.on("click", ".pcc-folder-move-up", function () {
+        moveFolder($(this).closest(".pcc-folder").data("folder-id"), -1);
+    });
+    $list.on("click", ".pcc-folder-move-down", function () {
+        moveFolder($(this).closest(".pcc-folder").data("folder-id"), 1);
     });
 
     $list.on("click", ".pcc-entry-collapse", function () {
@@ -333,6 +396,19 @@ function addSettingsUI() {
         }
     });
 
+    $list.on("change", ".pcc-folder-toggle", function () {
+        const id = $(this).closest(".pcc-folder").data("folder-id");
+        const checked = $(this).is(":checked");
+        const settings = loadSettings();
+        settings.entries.forEach(e => {
+            if (e.folderId === id) e.enabled = checked;
+        });
+        saveSettingsDebounced();
+        applyPersistentCSS();
+        renderEntries();
+        updateMasterToggle();
+    });
+
     $list.on("click", ".pcc-folder-delete", function () {
         const id = $(this).closest(".pcc-folder").data("folder-id");
         const settings = loadSettings();
@@ -377,6 +453,111 @@ function addSettingsUI() {
         applyPersistentCSS();
         renderEntries();
         updateMasterToggle();
+    });
+
+    $("#pcc-export").on("click", function () {
+        const settings = loadSettings();
+        const payload = {
+            type: "persistent-custom-css",
+            version: 1,
+            entries: settings.entries,
+            folders: settings.folders,
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        const stamp = new Date().toISOString().slice(0, 10);
+        a.href = url;
+        a.download = `persistent-custom-css-${stamp}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+
+    $("#pcc-import").on("click", function () {
+        $("#pcc-import-file").val("").trigger("click");
+    });
+
+    $("#pcc-import-file").on("change", async function () {
+        const file = this.files && this.files[0];
+        if (!file) return;
+
+        let data;
+        try {
+            data = JSON.parse(await file.text());
+        } catch (e) {
+            toastr.error("파일을 읽을 수 없어요. 올바른 JSON 파일인지 확인해주세요.");
+            return;
+        }
+
+        const importedEntries = Array.isArray(data.entries) ? data.entries : null;
+        const importedFolders = Array.isArray(data.folders) ? data.folders : [];
+        if (!importedEntries) {
+            toastr.error("이 확장에서 내보낸 파일이 아닌 것 같아요.");
+            return;
+        }
+
+        // 새 ID를 부여해서 기존 항목과 충돌하지 않게 함 + 폴더 매핑 유지
+        const folderIdMap = {};
+        const newFolders = importedFolders.map(f => {
+            const newId = genId();
+            folderIdMap[f.id] = newId;
+            return {
+                id: newId,
+                title: f.title ?? "폴더",
+                collapsed: !!f.collapsed,
+            };
+        });
+        const newEntries = importedEntries.map(e => ({
+            id: genId(),
+            title: e.title ?? "CSS",
+            enabled: e.enabled ?? true,
+            collapsed: !!e.collapsed,
+            folderId: e.folderId ? (folderIdMap[e.folderId] ?? null) : null,
+            css: e.css ?? "",
+        }));
+
+        const applyImport = (mode) => {
+            const settings = loadSettings();
+            if (mode === "overwrite") {
+                settings.entries = newEntries;
+                settings.folders = newFolders;
+                if (settings.entries.length === 0) {
+                    settings.entries.push({ id: genId(), title: "CSS 1", enabled: true, collapsed: false, folderId: null, css: "" });
+                }
+            } else {
+                settings.folders = settings.folders.concat(newFolders);
+                settings.entries = settings.entries.concat(newEntries);
+            }
+            activeFilter = "all";
+            saveSettingsDebounced();
+            applyPersistentCSS();
+            renderEntries();
+            updateMasterToggle();
+        };
+
+        const summary = `CSS 항목 ${newEntries.length}개, 폴더 ${newFolders.length}개`;
+
+        if (typeof callGenericPopup === "function" && typeof POPUP_TYPE !== "undefined") {
+            const result = await callGenericPopup(
+                `${summary}를 가져올게요.\n\n기존 항목을 어떻게 할까요?`,
+                POPUP_TYPE.TEXT,
+                "",
+                {
+                    okButton: "덮어쓰기",
+                    cancelButton: "취소",
+                    customButtons: [{ text: "기존에 추가", result: POPUP_RESULT.CUSTOM1 }],
+                }
+            );
+            if (result === POPUP_RESULT.AFFIRMATIVE) applyImport("overwrite");
+            else if (result === POPUP_RESULT.CUSTOM1) applyImport("append");
+            // 그 외(취소/닫기)는 아무것도 안 함
+        } else {
+            // 팝업 API를 못 쓰는 경우 기본 confirm으로 폴백
+            const overwrite = confirm(`${summary}를 가져옵니다.\n\n확인 = 덮어쓰기 / 취소 = 기존에 추가`);
+            applyImport(overwrite ? "overwrite" : "append");
+        }
     });
 }
 
