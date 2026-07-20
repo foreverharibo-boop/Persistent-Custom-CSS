@@ -89,6 +89,13 @@ function updateMasterToggle() {
     const settings = loadSettings();
     const allOn = settings.entries.length > 0 && settings.entries.every(e => e.enabled);
     $("#pcc-master-toggle").prop("checked", allOn);
+
+    // 각 폴더 토글도 그 폴더 안 항목이 전부 켜졌을 때만 켜진 상태로 맞춰줌
+    settings.folders.forEach(folder => {
+        const folderEntries = settings.entries.filter(e => e.folderId === folder.id);
+        const folderAllOn = folderEntries.length > 0 && folderEntries.every(e => e.enabled);
+        $(`.pcc-folder[data-folder-id="${folder.id}"] .pcc-folder-toggle`).prop("checked", folderAllOn);
+    });
 }
 
 function buildEntryHtml(entry, folders) {
@@ -186,7 +193,6 @@ function renderEntries() {
                         <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </button>
-                <span class="pcc-drag-handle pcc-folder-drag-handle" title="드래그해서 순서 변경">⠿</span>
                 <span class="pcc-folder-icon">📁</span>
                 <input type="text" class="pcc-folder-title" value="${escapeAttr(folder.title)}" placeholder="폴더 이름">
                 <label class="pcc-switch pcc-switch-sm pcc-folder-toggle-wrap">
@@ -267,7 +273,8 @@ function initSortable() {
     if (!$list.length || typeof $list.sortable !== "function") return; // jQuery UI 없으면 드래그 없이 동작
 
     const sortableOpts = {
-        handle: ".pcc-drag-handle",
+        handle: ".pcc-drag-handle, .pcc-folder-header",
+        cancel: ".pcc-folder-title, .pcc-folder-toggle, .pcc-folder-delete, .pcc-folder-collapse, input, textarea, select, button",
         items: "> .pcc-entry, > .pcc-folder",
         placeholder: "pcc-sort-placeholder",
         forcePlaceholderSize: true,
