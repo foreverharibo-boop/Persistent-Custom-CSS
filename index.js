@@ -193,6 +193,7 @@ function renderEntries() {
                         <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </button>
+                <span class="pcc-drag-handle pcc-folder-drag-handle" title="드래그해서 순서 변경">⠿</span>
                 <span class="pcc-folder-icon">📁</span>
                 <input type="text" class="pcc-folder-title" value="${escapeAttr(folder.title)}" placeholder="폴더 이름">
                 <label class="pcc-switch pcc-switch-sm pcc-folder-toggle-wrap">
@@ -273,8 +274,7 @@ function initSortable() {
     if (!$list.length || typeof $list.sortable !== "function") return; // jQuery UI 없으면 드래그 없이 동작
 
     const sortableOpts = {
-        handle: ".pcc-drag-handle, .pcc-folder-header",
-        cancel: ".pcc-folder-title, .pcc-folder-toggle, .pcc-folder-delete, .pcc-folder-collapse, input, textarea, select, button",
+        handle: ".pcc-drag-handle",
         items: "> .pcc-entry, > .pcc-folder",
         placeholder: "pcc-sort-placeholder",
         forcePlaceholderSize: true,
