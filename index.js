@@ -105,10 +105,7 @@ function buildEntryHtml(entry, folders) {
                     <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </button>
-            <span class="pcc-move">
-                <button type="button" class="pcc-move-up" title="위로">▲</button>
-                <button type="button" class="pcc-move-down" title="아래로">▼</button>
-            </span>
+            <span class="pcc-drag-handle" title="드래그해서 순서 변경">⠿</span>
             <input type="text" class="pcc-entry-title" value="${escapeAttr(entry.title)}" placeholder="이름 없음">
             <div class="pcc-entry-controls">
                 ${folders.length > 0 ? `
@@ -189,10 +186,7 @@ function renderEntries() {
                         <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </button>
-                <span class="pcc-move">
-                    <button type="button" class="pcc-folder-move-up" title="위로">▲</button>
-                    <button type="button" class="pcc-folder-move-down" title="아래로">▼</button>
-                </span>
+                <span class="pcc-drag-handle pcc-folder-drag-handle" title="드래그해서 순서 변경">⠿</span>
                 <span class="pcc-folder-icon">📁</span>
                 <input type="text" class="pcc-folder-title" value="${escapeAttr(folder.title)}" placeholder="폴더 이름">
                 <label class="pcc-switch pcc-switch-sm pcc-folder-toggle-wrap">
@@ -216,6 +210,89 @@ function renderEntries() {
     settings.entries
         .filter(e => !e.folderId)
         .forEach(entry => $list.append(buildEntryHtml(entry, settings.folders)));
+
+    initSortable();
+}
+
+// 드래그로 DOM 순서가 바뀐 뒤, 화면에 보이는 순서대로 settings.entries / folders를 다시 정렬
+function syncOrderFromDom() {
+    const settings = loadSettings();
+    const $list = $("#pcc-list");
+
+    // 폴더 순서: 리스트에 나타난 .pcc-folder 순서대로
+    const folderOrder = $list.children(".pcc-folder").map(function () {
+        return $(this).data("folder-id");
+    }).get();
+    if (folderOrder.length) {
+        settings.folders.sort((a, b) => folderOrder.indexOf(a.id) - folderOrder.indexOf(b.id));
+    }
+
+    // 항목 순서: 각 항목의 화면상 위치 + 소속 폴더를 읽어 재구성
+    const orderedEntries = [];
+    // 폴더 안 항목
+    $list.children(".pcc-folder").each(function () {
+        const folderId = $(this).data("folder-id");
+        $(this).find(".pcc-folder-entries > .pcc-entry").each(function () {
+            const id = $(this).data("id");
+            const entry = settings.entries.find(e => e.id === id);
+            if (entry) {
+                entry.folderId = folderId;
+                orderedEntries.push(entry);
+            }
+        });
+    });
+    // 폴더 밖(전체 보기 시 리스트 직속) 항목
+    $list.children(".pcc-entry").each(function () {
+        const id = $(this).data("id");
+        const entry = settings.entries.find(e => e.id === id);
+        if (entry) {
+            // 필터가 "미분류"나 특정 폴더일 때도 안전하게 처리
+            if (activeFilter === "all") entry.folderId = null;
+            orderedEntries.push(entry);
+        }
+    });
+
+    // DOM에 안 나온 항목(다른 필터로 가려진 것)은 뒤에 원래 순서대로 보존
+    settings.entries.forEach(e => {
+        if (!orderedEntries.includes(e)) orderedEntries.push(e);
+    });
+
+    settings.entries = orderedEntries;
+    saveSettingsDebounced();
+    applyPersistentCSS();
+}
+
+function initSortable() {
+    const $list = $("#pcc-list");
+    if (!$list.length || typeof $list.sortable !== "function") return; // jQuery UI 없으면 드래그 없이 동작
+
+    const sortableOpts = {
+        handle: ".pcc-drag-handle",
+        items: "> .pcc-entry, > .pcc-folder",
+        placeholder: "pcc-sort-placeholder",
+        forcePlaceholderSize: true,
+        tolerance: "pointer",
+        update: () => syncOrderFromDom(),
+    };
+
+    // 최상위: 폴더 + 폴더 밖 항목
+    if ($list.hasClass("ui-sortable")) $list.sortable("destroy");
+    $list.sortable(sortableOpts);
+
+    // 각 폴더 내부 항목 (폴더 간 이동 허용: connectWith)
+    $("#pcc-list .pcc-folder-entries").each(function () {
+        const $box = $(this);
+        if ($box.hasClass("ui-sortable")) $box.sortable("destroy");
+        $box.sortable({
+            handle: ".pcc-drag-handle",
+            items: "> .pcc-entry",
+            connectWith: ".pcc-folder-entries",
+            placeholder: "pcc-sort-placeholder",
+            forcePlaceholderSize: true,
+            tolerance: "pointer",
+            update: () => syncOrderFromDom(),
+        });
+    });
 }
 
 function addSettingsUI() {
@@ -293,50 +370,6 @@ function addSettingsUI() {
             applyPersistentCSS();
             updateMasterToggle();
         }
-    });
-
-    // 같은 그룹(같은 folderId, 또는 폴더 미지정끼리) 안에서 항목 순서를 위/아래로 이동
-    function moveEntry(id, dir) {
-        const settings = loadSettings();
-        const entry = settings.entries.find(e => e.id === id);
-        if (!entry) return;
-        // 같은 folderId를 가진 형제들의 전체 배열 내 인덱스 목록
-        const siblingIdx = settings.entries
-            .map((e, i) => ({ e, i }))
-            .filter(x => x.e.folderId === entry.folderId)
-            .map(x => x.i);
-        const pos = siblingIdx.indexOf(settings.entries.indexOf(entry));
-        const target = pos + dir;
-        if (target < 0 || target >= siblingIdx.length) return;
-        const a = siblingIdx[pos];
-        const b = siblingIdx[target];
-        [settings.entries[a], settings.entries[b]] = [settings.entries[b], settings.entries[a]];
-        saveSettingsDebounced();
-        applyPersistentCSS();
-        renderEntries();
-    }
-
-    function moveFolder(id, dir) {
-        const settings = loadSettings();
-        const idx = settings.folders.findIndex(f => f.id === id);
-        const target = idx + dir;
-        if (idx < 0 || target < 0 || target >= settings.folders.length) return;
-        [settings.folders[idx], settings.folders[target]] = [settings.folders[target], settings.folders[idx]];
-        saveSettingsDebounced();
-        renderEntries();
-    }
-
-    $list.on("click", ".pcc-move-up", function () {
-        moveEntry($(this).closest(".pcc-entry").data("id"), -1);
-    });
-    $list.on("click", ".pcc-move-down", function () {
-        moveEntry($(this).closest(".pcc-entry").data("id"), 1);
-    });
-    $list.on("click", ".pcc-folder-move-up", function () {
-        moveFolder($(this).closest(".pcc-folder").data("folder-id"), -1);
-    });
-    $list.on("click", ".pcc-folder-move-down", function () {
-        moveFolder($(this).closest(".pcc-folder").data("folder-id"), 1);
     });
 
     $list.on("click", ".pcc-entry-collapse", function () {

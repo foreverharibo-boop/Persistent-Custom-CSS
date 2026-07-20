@@ -192,28 +192,30 @@
     gap: 8px;
 }
 
-.pcc-move {
-    display: flex;
-    flex-direction: column;
-    line-height: 0;
+.pcc-drag-handle {
     flex-shrink: 0;
-    gap: 1px;
-}
-.pcc-move button {
-    background: transparent;
-    border: none;
     color: var(--pcc-text);
-    opacity: 0.4;
-    font-size: 8px;
+    opacity: 0.35;
+    font-size: 13px;
     line-height: 1;
-    cursor: pointer;
+    cursor: grab;
     padding: 0 2px;
+    touch-action: none;
+    user-select: none;
 }
-.pcc-move button:hover {
-    opacity: 0.9;
+.pcc-drag-handle:active {
+    cursor: grabbing;
+    opacity: 0.7;
 }
 .pcc-folder-toggle-wrap {
     flex-shrink: 0;
+}
+.pcc-sort-placeholder {
+    border: 1px dashed var(--pcc-accent);
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--pcc-accent) 8%, transparent);
+    margin-bottom: 8px;
+    visibility: visible !important;
 }
 
 .pcc-entry-collapse {
