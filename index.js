@@ -101,7 +101,7 @@ function updateMasterToggle() {
 function buildEntryHtml(entry, folders) {
     const isCollapsed = !!entry.collapsed;
     const folderOptions = folders.map(f =>
-        `<option value="${f.id}" ${entry.folderId === f.id ? "selected" : ""}>${escapeAttr(f.title)}</option>`
+        `<option value="${f.id}" ${entry.folderId === f.id ? "selected" : ""}>📁 ${escapeAttr(f.title)}</option>`
     ).join("");
 
     return `
@@ -117,7 +117,7 @@ function buildEntryHtml(entry, folders) {
             <div class="pcc-entry-controls">
                 ${folders.length > 0 ? `
                 <select class="pcc-entry-folder" title="폴더로 이동">
-                    <option value="">폴더 없음</option>
+                    <option value="">📂 폴더 없음</option>
                     ${folderOptions}
                 </select>` : ""}
                 <label class="pcc-switch">

@@ -177,24 +177,24 @@
 }
 
 .pcc-entry-folder {
-    background: transparent !important;
-    border: none !important;
+    background: var(--pcc-field-bg) !important;
+    border: 1px solid transparent !important;
     box-shadow: none !important;
-    border-radius: 0 !important;
-    color: color-mix(in srgb, var(--pcc-text) 55%, transparent) !important;
+    border-radius: 6px !important;
+    color: color-mix(in srgb, var(--pcc-text) 62%, transparent) !important;
     font-size: 10px !important;
     font-weight: 600 !important;
-    padding: 1px 2px !important;
-    max-width: 60px;
+    padding: 2px 7px !important;
+    max-width: 74px;
     height: auto !important;
     min-height: 0 !important;
     outline: none;
     cursor: pointer;
     appearance: none;
     -webkit-appearance: none;
-    text-align: right;
 }
 .pcc-entry-folder:hover {
+    border-color: var(--pcc-border) !important;
     color: var(--pcc-accent) !important;
 }
 
