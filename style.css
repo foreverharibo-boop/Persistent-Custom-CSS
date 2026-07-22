@@ -186,12 +186,15 @@
     font-weight: 600 !important;
     padding: 2px 7px !important;
     max-width: 74px;
-    height: auto !important;
+    height: 20px !important;
     min-height: 0 !important;
+    line-height: 1 !important;
     outline: none;
     cursor: pointer;
     appearance: none;
     -webkit-appearance: none;
+    align-self: center;
+    vertical-align: middle;
 }
 .pcc-entry-folder:hover {
     border-color: var(--pcc-border) !important;
