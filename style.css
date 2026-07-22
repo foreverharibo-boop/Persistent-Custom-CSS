@@ -177,14 +177,17 @@
 }
 
 .pcc-entry-folder {
-    background: transparent;
-    border: none;
-    border-radius: 0;
-    color: color-mix(in srgb, var(--pcc-text) 55%, transparent);
-    font-size: 10px;
-    font-weight: 600;
-    padding: 1px 2px;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    color: color-mix(in srgb, var(--pcc-text) 55%, transparent) !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    padding: 1px 2px !important;
     max-width: 60px;
+    height: auto !important;
+    min-height: 0 !important;
     outline: none;
     cursor: pointer;
     appearance: none;
@@ -192,7 +195,7 @@
     text-align: right;
 }
 .pcc-entry-folder:hover {
-    color: var(--pcc-accent);
+    color: var(--pcc-accent) !important;
 }
 
 .pcc-btn-row {
