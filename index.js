@@ -218,7 +218,7 @@ function renderEntries() {
                     <input type="checkbox" class="pcc-folder-toggle">
                     <span class="pcc-track"><span class="pcc-thumb"></span></span>
                 </label>
-                <button type="button" class="pcc-folder-delete" title="폴더 삭제 (안의 항목은 유지됨)">✕</button>
+                <button type="button" class="pcc-folder-delete" title="폴더 삭제 (안의 항목은 유지됨)" aria-label="폴더 삭제">✕</button>
             </div>
             <div class="pcc-folder-body">
                 <div class="pcc-folder-entries"></div>
