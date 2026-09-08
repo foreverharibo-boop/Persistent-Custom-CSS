@@ -131,27 +131,16 @@
 }
 .pcc-folder-delete {
     background: transparent;
-    border: 1px solid var(--pcc-border);
-    border-radius: 6px;
+    border: none;
     color: var(--pcc-text);
-    opacity: 0.8;
-    font-size: 13px;
-    line-height: 1;
+    opacity: 0.4;
+    font-size: 11px;
     cursor: pointer;
-    padding: 0;
-    width: 26px;
-    min-width: 26px;
-    height: 26px;
+    padding: 2px;
     flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
 }
 .pcc-folder-delete:hover {
-    background: color-mix(in srgb, var(--pcc-accent) 12%, transparent);
-    border-color: var(--pcc-accent);
-    color: var(--pcc-accent);
-    opacity: 1;
+    opacity: 0.9;
 }
 .pcc-folder-collapse {
     background: transparent;
