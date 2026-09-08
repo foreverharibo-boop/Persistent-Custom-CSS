@@ -22,6 +22,24 @@ function escapeAttr(str) {
         .replace(/>/g, "&gt;");
 }
 
+async function confirmDelete(message) {
+    if (typeof callGenericPopup === "function" && typeof POPUP_TYPE !== "undefined") {
+        const result = await callGenericPopup(
+            message,
+            POPUP_TYPE.CONFIRM,
+            "",
+            {
+                okButton: "삭제",
+                cancelButton: "취소",
+            }
+        );
+        return result === POPUP_RESULT.AFFIRMATIVE;
+    }
+
+    // 구버전 등에서 ST 팝업 API를 사용할 수 없을 때만 브라우저 확인창 사용
+    return window.confirm(message);
+}
+
 function loadSettings() {
     if (!extension_settings[extensionName]) {
         extension_settings[extensionName] = structuredClone(defaultSettings);
@@ -401,9 +419,15 @@ function addSettingsUI() {
         }
     });
 
-    $list.on("click", ".pcc-entry-delete", function () {
+    $list.on("click", ".pcc-entry-delete", async function () {
         const id = $(this).closest(".pcc-entry").data("id");
         const settings = loadSettings();
+        const entry = settings.entries.find(e => e.id === id);
+        if (!entry) return;
+
+        const title = entry.title?.trim() || "이름 없는 CSS";
+        if (!await confirmDelete(`“${title}” 항목을 삭제할까요?`)) return;
+
         settings.entries = settings.entries.filter(e => e.id !== id);
         if (settings.entries.length === 0) {
             settings.entries.push({ id: genId(), title: "CSS 1", enabled: true, collapsed: false, folderId: null, css: "" });
@@ -449,9 +473,15 @@ function addSettingsUI() {
         updateMasterToggle();
     });
 
-    $list.on("click", ".pcc-folder-delete", function () {
+    $list.on("click", ".pcc-folder-delete", async function () {
         const id = $(this).closest(".pcc-folder").data("folder-id");
         const settings = loadSettings();
+        const folder = settings.folders.find(f => f.id === id);
+        if (!folder) return;
+
+        const title = folder.title?.trim() || "이름 없는 폴더";
+        if (!await confirmDelete(`“${title}” 폴더를 삭제할까요?\n\n폴더 안의 CSS 항목은 삭제되지 않고 미분류로 이동해요.`)) return;
+
         settings.folders = settings.folders.filter(f => f.id !== id);
         settings.entries.forEach(e => { if (e.folderId === id) e.folderId = null; });
         saveSettingsDebounced();
